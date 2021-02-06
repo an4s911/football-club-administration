@@ -16,7 +16,27 @@ dbExec = dbCursor.execute
 # True and False respectively
 loggedIn = False 
 
-def main(loggedIn=False):
+def fcInput(prompt):
+	"""
+	This function is a custom input function which is gonna be used in this 
+	program instead of the default input() function. 
+
+	It will do some checks on the user's input and then returns the value 
+	input by the user if conditions meet like if the input is 'q' then the 
+	program quits and 'm' is used to go back to main menu.
+	"""
+	user_input = input(prompt)
+
+	if user_input in ['q', 'm']:
+		if user_input == 'q':
+			quit()
+		elif user_input == 'm':
+			main()
+	else:
+		return user_input
+
+def main():
+	global loggedIn
 	"""
 	Main function for the program. 
 	It takes in 1 argument 'loggedIn' and the default value if False
@@ -28,7 +48,7 @@ def main(loggedIn=False):
 		print("1. Login")
 		print("2. Guest")
 		print("na. New Admin")
-		ch = int(input("1/2\n:"))
+		ch = int(fcInput("1/2\n:"))
 
 		if ch == 1:
 			login()
@@ -49,7 +69,7 @@ def main(loggedIn=False):
 		print("3. Transfers")
 		print("4. Events/ News")
 
-		ch = int(input("1/2/3/4\n:"))
+		ch = int(fcInput("1/2/3/4\n:"))
 
 		if ch == 1:
 			members()
@@ -67,7 +87,7 @@ def login():
 	"""
 	pass
 	"""
-	username = input("Username: ")
+	username = fcInput("Username: ")
 	password = getpass.getpass("Password: ")
 
 	dbExec("select username, password from admins")
@@ -75,7 +95,15 @@ def login():
 	for admin in userpass_admins:
 		if username.lower() == admin[0].lower():
 			if password == admin[1]:
+				global loggedIn
 				loggedIn = True
+				main()
+			else:
+				print("Incorrect Password. Try again!")
+				login()
+		else:
+			print("Username not found.")
+			login()
 
 def guest():
 	"""pass"""
