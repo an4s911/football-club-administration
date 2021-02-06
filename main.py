@@ -48,7 +48,7 @@ def main():
 		print("1. Login")
 		print("2. Guest")
 		print("na. New Admin")
-		ch = int(fcInput("1/2\n:"))
+		ch = int(fcInput("1/2:"))
 
 		if ch == 1:
 			login()
@@ -69,7 +69,7 @@ def main():
 		print("3. Transfers")
 		print("4. Events/ News")
 
-		ch = int(fcInput("1/2/3/4\n:"))
+		ch = int(fcInput("1/2/3/4:"))
 
 		if ch == 1:
 			members()
@@ -97,12 +97,13 @@ def login():
 			if password == admin[1]:
 				global loggedIn
 				loggedIn = True
+				print("You are now Logged In 😄")
 				main()
 			else:
-				print("Incorrect Password. Try again!")
+				print("Incorrect Password😕. Try again!😌")
 				login()
 		else:
-			print("Username not found.")
+			print("Username not found.😐")
 			login()
 
 def guest():
@@ -124,3 +125,6 @@ def payments():
 def events():
 	"""pass"""
 	pass
+
+if __name__=="__main__":
+	main()
