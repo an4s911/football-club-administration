@@ -4,12 +4,16 @@ import getpass
 # Database connection lines. Connecting to database fc_admin
 db = mc.connect(
 	host='localhost', 
-	user='root', 
-	auth_plugin='mysql_native_password', 
-	database='fc_admin'
+	user='root',
+	passwd='',
+	auth_plugin='mysql_native_password'
 	)
 dbCursor = db.cursor()
 Exec = dbCursor.execute
+
+Exec("create database if not exists fc_admin")
+Exec("use fc_admin")
+Exec("create table if not exists admins(name varchar(20), username varchar(20), password varchar(50), nationality varchar(20))")
 
 # This is the variable that determines if the user is logged in or not
 # It will be changed each time the user logs in or out to the values 
@@ -53,6 +57,14 @@ def fcInput(prompt):
 		return user_input
 
 def instructions():
+	print("""------------------------------
+Instructions on How to use this software.
+In any input space you can use the following characters to do the respective task.
+q - To quit the program (asks for confirmation)
+m - Go back to the main menu
+lo - Logout out of your account
+help - To show this instructions
+------------------------------""")
 	main()
 
 def main():
@@ -63,6 +75,7 @@ def main():
 
 	# Checks if the user is already loggin in and if not then asks to login
 	# or else the user can explore as guest
+	print("Main Menu")
 	if loggedIn == False:
 		print("You are not logged in")
 		print("Select one of the below")
