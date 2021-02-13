@@ -21,7 +21,7 @@ Exec("create table if not exists admins(name varchar(20), username varchar(20), 
 loggedIn = False
 guest = False
 
-user_info = {'guest': False, 'loggedIn': False}
+user_info = {'guest': False, 'loggedIn': False, 'username': None}
 
 def fcInput(prompt):
 	"""
@@ -81,7 +81,30 @@ def main():
 	# Checks if the user is already loggin in and if not then asks to login
 	# or else the user can explore as guest
 	print("Main Menu")
-	if loggedIn == False:
+	if loggedIn:
+		print("Admin Controls!")
+		print("1. Members")
+		print("2. Payments")
+		print("3. Transfers")
+		print("4. Events/ News")
+
+		ch = int(fcInput("1/2/3/4:"))
+
+		if ch == 1:
+			show_admins()
+		elif ch == 2:
+			payments()
+		elif ch == 3:
+			transfers()
+		elif ch == 4:
+			events()
+		else:
+			print("Invalid")
+			main(loggedIn)
+
+	# If user is logged in as an admin, then they can do jobs as listed:
+	# Manage Members, Payments, Transfers, Events/ News
+	else:
 		print("You are not logged in")
 		print("Select one of the below")
 		print("1. Login")
@@ -99,32 +122,9 @@ def main():
 			print("Invalid Input!")
 			main(loggedIn)
 
-	# If user is logged in as an admin, then they can do jobs as listed:
-	# Manage Members, Payments, Transfers, Events/ News
-	else:
-		print("Admin Controls!")
-		print("1. Members")
-		print("2. Payments")
-		print("3. Transfers")
-		print("4. Events/ News")
-
-		ch = int(fcInput("1/2/3/4:"))
-
-		if ch == 1:
-			members()
-		elif ch == 2:
-			payments()
-		elif ch == 3:
-			transfers()
-		elif ch == 4:
-			events()
-		else:
-			print("Invalid")
-			main(loggedIn)
-
 def login():
 	"""
-	pass
+	The login Function
 	"""
 	global loggedIn
 	username = fcInput("Username: ")
@@ -165,11 +165,15 @@ def guest():
 
 
 def show_admins():
+	"""
+	show_admins()
+	"""
 	global loggedIn
 	Exec('desc admins')
 	colnames = [colname[0] for colname in dbCursor.fetchall()]
 	Exec('select * from admins')
 	admins = [dict(admin) for admin in [list(zip(colnames, admin)) for admin in dbCursor.fetchall()]]
+
 	print("For more details on each admin, enter the number preceeding the name.")
 	while True:
 		for admin in admins:
@@ -177,7 +181,38 @@ def show_admins():
 
 		ch = int(fcInput(': '))
 		try:
-			print(admins[ch-1])
+			admin_details = admins[ch-1]
+
+			if loggedIn:
+				print("Options available on member:")
+				print("1. Delete Member")
+				print("2. Show details")
+				print("3. Modify details")
+
+				ch = int(fcInput(": "))
+
+				if ch == 1:
+					confirmation = fcInput("Are you sure to delete (y/n): ")
+					if confirmation.lower() in ['y', 'yes']:
+						username = admin_details['username']
+						print("--- Deleting Account ---")
+						print("--- Removing from database ---")
+						Exec(f"delete from admins where username='{username}'")
+						db.commit()
+						print("--- Removed account details from Database ---")
+						print(f"--- Deleted admin account for {username} ---")
+						print()
+						print("You will be logged out and returned to Main Menu for security reasons")
+						loggedIn = False
+						main()
+
+					else:
+						continue
+			else:
+				for detail in admin_details:
+					if detail != 'password':
+						print(detail.capitalize(), '-->', admin_details[detail].capitalize())
+
 			if fcInput("Main menu? (y/n): ").lower() in ['y', 'yes']:
 				main()
 			else:
@@ -185,7 +220,7 @@ def show_admins():
 		except IndexError:
 			print("Invalid!")
 
-def new_admin()->None:
+def new_admin():
 	"""
 	To create a new admin account.
 
@@ -215,10 +250,6 @@ def new_admin()->None:
 	else:
 		print("Invaild key")
 		new_admin()
-
-def members():
-	"""pass"""
-	pass
 
 def payments():
 	"""pass"""
