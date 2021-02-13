@@ -1,5 +1,5 @@
 import mysql.connector as mc
-import getpass
+from getpass import getpass
 
 # Database connection lines. Connecting to database fc_admin
 db = mc.connect(
@@ -33,26 +33,31 @@ def fcInput(prompt):
 	program quits and 'm' is used to go back to main menu.
 	"""
 	global loggedIn
-	user_input = input(prompt).lower()
+	user_input = input(prompt)
 
-	if user_input in ['q', 'm', 'lo', 'help']:
-		if user_input == 'q':
+	copy_user_input = user_input.lower()
+
+	if copy_user_input in ['q', 'm', 'lo', 'help']:
+		if copy_user_input == 'q':
 			quit_confirm_input = input("Are you sure you want to quit? y/n: ")
 			if quit_confirm_input.lower() in ['y', 'yes']:
 				quit()
 			else: 
 				main()
-		elif user_input == 'm':
+		elif copy_user_input == 'm':
 			main()
-		elif user_input == 'lo':
+		elif copy_user_input == 'lo':
 			if loggedIn == True:
 				loggedIn = False
 				print("You have been logged out.")
 				main()
 			else:
 				main()
-		elif user_input == 'help':
+		elif copy_user_input == 'help':
 			instructions()
+	elif not copy_user_input:
+		print("Invalid Input! Going back to the main menu")
+		main()
 	else:
 		return user_input
 
@@ -123,7 +128,7 @@ def login():
 	"""
 	global loggedIn
 	username = fcInput("Username: ")
-	password = getpass.getpass("Password: ")
+	password = getpass("Password: ")
 
 	Exec("select username, password from admins")
 	userpass_admins = dbCursor.fetchall()
@@ -132,14 +137,16 @@ def login():
 			if password == admin[1]:
 				
 				loggedIn = True
-				print("You are now Logged In 😄")
+				print("You are now Logged In")
 				main()
+				break
 			else:
-				print("Incorrect Password😕. Try again!😌")
+				print("Incorrect Password. Try again!")
 				login()
-		else:
-			print("Username not found.😐")
-			login()
+				break
+	else:
+		print("Username not found.")
+		login()
 
 def guest():
 	global loggedIn
@@ -178,9 +185,36 @@ def show_admins():
 		except IndexError:
 			print("Invalid!")
 
-def new_admin():
-	"""pass"""
-	pass
+def new_admin()->None:
+	"""
+	To create a new admin account.
+
+	It takes no arguments
+
+	The user can create an admin account only if authorized, 
+	and to verify the user must input an Admin Key which is
+	mandatory.
+
+	This function returns --> None
+	"""
+	print("For creating a new admin account, the admin key is required")
+	admin_key_input = fcInput("Admin Key: ") 
+	admin_key = open('admin_key.txt').read() # The admin key is "ADMIN"
+	if admin_key_input == admin_key:
+		print("That is the valid key. Fill the following details.")
+		name = fcInput("Name: ")
+		username = fcInput("Username: ")
+		password = getpass("Password: ")
+		nationality = fcInput("Nationality: ")
+		Exec(f"insert into admins values('{name}', '{username}', '{password}', '{nationality}')")
+		db.commit()
+		print("... Signing Up....")
+		print("Successfully Registered")
+		main()
+
+	else:
+		print("Invaild key")
+		new_admin()
 
 def members():
 	"""pass"""
