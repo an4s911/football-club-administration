@@ -1,7 +1,6 @@
 import mysql.connector as mc
 from getpass import getpass
 from datetime import date
-import re
 
 # Database connection lines. Connecting to database fc_admin
 db = mc.connect(
@@ -97,7 +96,7 @@ def main():
 	# or else the user can explore as guest
 
 	global loggedIn
-	
+
 	print("Main Menu")
 
 	if loggedIn:
